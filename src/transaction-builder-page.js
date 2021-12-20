@@ -14,7 +14,7 @@ import CodeEditor from '@uiw/react-textarea-code-editor';
 import { getAllUtxos, connectYoroi, getChangeAddress, yoroiSignTx} from './ergo-related/yoroi';
 import { parseUtxo, parseUtxos, generateSwaggerTx, enrichUtxos, buildBalanceBox } from './ergo-related/utxos';
 import JSONBigInt from 'json-bigint';
-import { errorAlert } from './utils/Alerts';
+import { errorAlert, waitingAlert } from './utils/Alerts';
 
 /* global BigInt */
 
@@ -131,8 +131,10 @@ export default class TxBuilder extends React.Component {
     }
 
     fetchYoroi() {
+        var alert = waitingAlert("Connecting to Yoroi...");
         connectYoroi().then(access_granted => {
             if (access_granted) {
+                alert.update({title: "Get Yoroi wallet content..."})
                 getAllUtxos().then(utxos => {
                     console.log("utxos", utxos)
                     this.setState({
@@ -141,15 +143,14 @@ export default class TxBuilder extends React.Component {
                 }).then(
                     getChangeAddress().then(yoroiAddress => {
                         this.setSearchAddress(yoroiAddress);
-                    }
-
-                    )
+                        alert.close();
+                    })
                 )
             } else {
-                console.log("Yoroi access failed")
+                console.log("Yoroi access failed");
+                errorAlert("Yoroi access failed");
             }
         })
-
     }
 
     selectInputBox(box) {
@@ -430,9 +431,9 @@ export default class TxBuilder extends React.Component {
                                             boxId={item.boxId}
                                             json={item}
                                             action={this.unSelectDataInputBox}
-                                            icon="delete"
+                                            icon="clear"
                                             tips="Remove from selected data inputs"
-                                            color="blue"
+                                            color="red"
                                         />
                                     </div>
                                 ))}
@@ -450,12 +451,12 @@ export default class TxBuilder extends React.Component {
                                             boxId={item.boxId}
                                             json={item}
                                             action={this.unSelectInputBox}
-                                            icon="delete"
+                                            icon="clear"
                                             tips="Remove from selected inputs"
                                             id={index}
                                             moveUp={this.moveInputBoxUp}
                                             moveDown={this.moveInputBoxDown}
-                                            color="blue"
+                                            color="red"
                                         />
                                     </div>
                                 ))}

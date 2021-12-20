@@ -10,18 +10,6 @@ export function UtxoItem(props) {
             { props.id !== undefined ? <h6>INPUTS({props.id})</h6> : null }
             <div className="d-flex flex-row">
                 <div className="monospace">Box id: {formatLongString(props.boxId, 15)}&nbsp;</div>
-                <ImageButton id="add" color={props.color}
-                    onClick={() => props.action(props.json)}
-                    icon={props.icon}
-                    tips={props.tips} />
-                {
-                    props.action2 ? <ImageButton id="add2" color={props.color}
-                        onClick={() => props.action2(props.json)}
-                        icon="post_add"
-                        tips="Add to data inputs"
-                    />
-                        : null
-                }
                 {
                     props.moveUp ? <ImageButton id="move-up" color="green"
                         onClick={() => props.moveUp(props.id)}
@@ -38,6 +26,19 @@ export function UtxoItem(props) {
                     />
                         : null
                 }
+                <ImageButton id="add" color={props.color}
+                    onClick={() => props.action(props.json)}
+                    icon={props.icon}
+                    tips={props.tips} />
+                {
+                    props.action2 ? <ImageButton id="add2" color={props.color}
+                        onClick={() => props.action2(props.json)}
+                        icon="post_add"
+                        tips="Add to data inputs"
+                    />
+                        : null
+                }
+                
             </div>
             <ReactJson
                 src={props.json}
