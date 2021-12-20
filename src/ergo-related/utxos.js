@@ -4,16 +4,19 @@ import { encodeContract } from "./serializer";
 
 /* global BigInt */
 
-export function parseUtxo(json, addExtention = true) {
+export function parseUtxo(json, addExtention = true, mode = 'input') {
     if (json == undefined) {
         return {};
     }
     var res = {};
-    if ("id" in json) {
-        res["boxId"] = json.id;
-    } else {
-        res["boxId"] = json.boxId;
+    if (mode == 'input') {
+        if ("id" in json) {
+            res["boxId"] = json.id;
+        } else {
+            res["boxId"] = json.boxId;
+        }
     }
+    
     res["value"] = json.value.toString();
     res["ergoTree"] = json.ergoTree;
     res["assets"] = json.assets.map(asset => ({
@@ -22,23 +25,26 @@ export function parseUtxo(json, addExtention = true) {
     }));
     res["additionalRegisters"] = parseAdditionalRegisters(json.additionalRegisters);
     res["creationHeight"] = json.creationHeight;
-    if ("txId" in json) {
-        res["transactionId"] = json.txId;
-    } else {
-        res["transactionId"] = json.transactionId;
+
+    if (mode == 'input') {
+        if ("txId" in json) {
+            res["transactionId"] = json.txId;
+        } else {
+            res["transactionId"] = json.transactionId;
+        }
+        res["index"] = json.index;
     }
-    res["index"] = json.index;
-    
+
     if (addExtention) {
         res["extension"] = {};
     }
     return res;
 }
 
-export function parseUtxos(utxos, addExtention) {
+export function parseUtxos(utxos, addExtention, mode = 'input') {
     var utxosFixed = [];
     for (const i in utxos) {
-        utxosFixed.push(parseUtxo(utxos[i], addExtention))
+        utxosFixed.push(parseUtxo(utxos[i], addExtention, mode))
     }
     return utxosFixed;
 }

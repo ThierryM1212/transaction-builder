@@ -331,11 +331,11 @@ export default class TxBuilder extends React.Component {
             if ("tx" in json) {
                 inputs = await enrichUtxos(json.tx.inputs);
                 dataInputs = await enrichUtxos(json.tx.dataInputs);
-                outputs = parseUtxos(json.tx.outputs);
+                outputs = parseUtxos(json.tx.outputs, true, 'output');
             } else {
                 inputs = await enrichUtxos(json.inputs);
                 dataInputs = await enrichUtxos(json.dataInputs);
-                outputs = parseUtxos(json.outputs);
+                outputs = parseUtxos(json.outputs, true, 'output');
             }
 
             this.setState({
