@@ -1,0 +1,68 @@
+.App {
+  text-align: center;
+  
+}
+
+.App-header {
+  background-color: rgb(39, 40, 34);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgb(212, 212, 212);
+  
+}
+
+.container-xxl {
+  display: inline-flex;
+  writing-mode: horizontal-tb;
+  align-content: flex-start;
+  flex: 1;
+}
+
+.card {
+  background-color: rgb(51, 51, 51);
+  border-color: rgb(141, 140, 143);
+  text-align: left;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.grey-input {
+  background-color: #c4c4c4;
+}
+
+th {
+  text-align: center;
+}
+
+tr td {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+tr td:not(:last-child){
+  white-space: nowrap;
+}
+
+tr td:last-child{
+  width: 100%;
+}
+
+.material-icons.red { color: #E0343A;}
+.material-icons.green { color: #3e9428;}
+.material-icons.blue { color: #216A94;}
+.material-icons.orange { color: #E0DD31;}
+
+.outButtonAction {
+  align-self: end;
+  display: flex;
+  justify-content: center;
+}
+
+.monospace {
+  font-family: 'Source Code Pro', monospace;
+}
