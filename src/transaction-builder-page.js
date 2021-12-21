@@ -664,6 +664,7 @@ export default class TxBuilder extends React.Component {
                             <InputString label="Mnemonic"
                                 value={this.state.mnemonic}
                                 onChange={this.setMnemonic}
+                                type="password"
                             />
                             { this.state.signedTransaction !== '' ?
                                 <div>

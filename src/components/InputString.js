@@ -12,7 +12,9 @@ export default function InputString(props) {
                 id="ref"
                 pattern="[a-zA-Z0-9]*"
                 onChange={e => props.onChange(e.target.value)}
-                value={props.value} />
+                value={props.value} 
+                type={props.type} 
+                />
                 </div>
             &nbsp;
             { props.onClick ?
