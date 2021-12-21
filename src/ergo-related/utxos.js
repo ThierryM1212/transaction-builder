@@ -5,11 +5,11 @@ import { encodeContract } from "./serializer";
 /* global BigInt */
 
 export function parseUtxo(json, addExtention = true, mode = 'input') {
-    if (json == undefined) {
+    if (json === undefined) {
         return {};
     }
     var res = {};
-    if (mode == 'input') {
+    if (mode === 'input') {
         if ("id" in json) {
             res["boxId"] = json.id;
         } else {
@@ -26,7 +26,7 @@ export function parseUtxo(json, addExtention = true, mode = 'input') {
     res["additionalRegisters"] = parseAdditionalRegisters(json.additionalRegisters);
     res["creationHeight"] = json.creationHeight;
 
-    if (mode == 'input') {
+    if (mode === 'input') {
         if ("txId" in json) {
             res["transactionId"] = json.txId;
         } else {
@@ -94,7 +94,6 @@ export function generateSwaggerTx(json) {
     res.tx.outputs = json.outputs;
     return res;
 }
-
 
 export function getUtxosListValue(utxos) {
     return utxos.reduce((acc, utxo) => acc += BigInt(utxo.value), BigInt(0));
@@ -171,3 +170,5 @@ export async function buildBalanceBox(inputs, outputs, address) {
         extension: {}
     };
 }
+
+

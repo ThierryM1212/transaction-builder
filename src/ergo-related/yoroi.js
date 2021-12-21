@@ -1,10 +1,6 @@
-import { buildTokenList, getMissingErg, getMissingTokens, isDict } from "../utils/utils";
 import { closeAlert, waitingAlert, errorAlert, displayTransaction } from '../utils/Alerts';
-import JSONBigInt from 'json-bigint';
-import { boxById, currentHeight } from "./explorer";
-import { encodeContract } from "./serializer";
 
-/* global ergo BigInt */
+/* global ergo */
 
 
 export async function isYoroiConnected() {
@@ -19,7 +15,6 @@ export async function isYoroiConnected() {
 
 // Connect to Yoroi, return True is success
 export async function connectYoroi() {
-    
     const alreadyConnected = await isYoroiConnected();
     console.log('connectYoroi', alreadyConnected);
     if (!alreadyConnected) {
@@ -40,7 +35,6 @@ export async function getChangeAddress() {
 }
 
 export async function yoroiSignTx(tx) {
-    
     const alert = waitingAlert("Connecting to Yoroi...");
     const yoroiAccessGranted = await connectYoroi();
     console.log('yoroiSignTx', yoroiAccessGranted);
@@ -104,8 +98,6 @@ export async function processTx(txToBeProcessed) {
 }
 
 export async function getAllUtxos() {
-    const wasm = await import("ergo-lib-wasm-browser").catch(console.error);
-    const filteredUtxos = [];
     return await ergo.get_utxos();
 }
 

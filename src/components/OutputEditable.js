@@ -50,7 +50,7 @@ export default class OutputEditable extends React.Component {
                         this.setState({ json: item.updated_src });
                     }}
                     onAdd={(item) => {
-                        if (item.name == "assets") {
+                        if (item.name === "assets") {
                             const defaultToken = { "tokenId": "", "amount": 0 };
                             this.setState(prevState => ({
                                 json: {

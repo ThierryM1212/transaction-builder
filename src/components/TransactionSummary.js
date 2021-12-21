@@ -35,7 +35,7 @@ export default function TransactionSummary(props) {
                     <tr key="tx-sum-2">
                         <td>ERGs</td><td>{parseFloat(inputNanoErgAmount / 1000000000).toFixed(9).replace(/(\.0+|0+)$/, '')}</td><td>{parseFloat(outputsNanoErgAmount / 1000000000).toFixed(9).replace(/(\.0+|0+)$/, '')}</td>
                         <td>
-                            {(inputNanoErgAmount == outputsNanoErgAmount) ?
+                            {(inputNanoErgAmount === outputsNanoErgAmount) ?
                                 <ImageButtonLabeled id="nanoerg-diff" color="green" icon="price_check" label="OK" />
                                 : <ImageButtonLabeled id="nanoerg-diff" color="red" icon="error_outline" label="Wrong erg balance" />
                             }
@@ -45,7 +45,7 @@ export default function TransactionSummary(props) {
                         Object.entries(tokenDiffArray).map(([key, value]) => (
                             <tr key={key}><td>{key}</td><td>{value[0]}</td><td>{value[1]}</td><td>
                                 {
-                                    (value[0] == value[1]) ?
+                                    (value[0] === value[1]) ?
                                     <ImageButtonLabeled id="token-diff" color="green" icon="verified" label="OK" />
                                         : (value[0] > value[1]) ?
                                             <ImageButtonLabeled id="token-diff" color="orange" icon="warning_amber" label="Tokens burned in output" />

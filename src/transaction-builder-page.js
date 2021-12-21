@@ -7,12 +7,14 @@ import OutputEditable from './components/OutputEditable';
 import TransactionSummary from './components/TransactionSummary';
 import ImageButton from './components/ImageButton';
 import ImageButtonLabeled from './components/ImageButtonLabeled';
+import QRCodes from './components/QRCodes';
 import ReactJson from 'react-json-view';
 import { UtxoItem } from './components/UtxoItem';
 import { unspentBoxesFor, boxById } from './ergo-related/explorer';
 import CodeEditor from '@uiw/react-textarea-code-editor';
-import { getAllUtxos, connectYoroi, getChangeAddress, yoroiSignTx} from './ergo-related/yoroi';
+import { getAllUtxos, connectYoroi, getChangeAddress, yoroiSignTx } from './ergo-related/yoroi';
 import { parseUtxo, parseUtxos, generateSwaggerTx, enrichUtxos, buildBalanceBox } from './ergo-related/utxos';
+import { getTxReduced, getTxJsonFromTxReduced } from './ergo-related/serializer';
 import JSONBigInt from 'json-bigint';
 import { errorAlert, waitingAlert } from './utils/Alerts';
 
@@ -54,6 +56,8 @@ export default class TxBuilder extends React.Component {
             setSearchAddress: props.setSearchAddress,
             outputCreateJson: initCreateBox,
             txJsonRaw: '',
+            txReduced: [],
+            CSR: [],
         };
         this.fetchUtxos = this.fetchUtxos.bind(this);
         this.fetchByBoxId = this.fetchByBoxId.bind(this);
@@ -76,6 +80,9 @@ export default class TxBuilder extends React.Component {
         this.setTxYoroiJsonRaw = this.setTxYoroiJsonRaw.bind(this);
         this.setTxSwaggerJsonRaw = this.setTxSwaggerJsonRaw.bind(this);
         this.loadTxFromJsonRaw = this.loadTxFromJsonRaw.bind(this);
+        this.setTxReduced = this.setTxReduced.bind(this);
+        this.loadTxReduced = this.loadTxReduced.bind(this);
+        this.resetTxReduced = this.resetTxReduced.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -89,7 +96,7 @@ export default class TxBuilder extends React.Component {
     fetchUtxos() {
         unspentBoxesFor(this.state.address)
             .then(addressBoxList => {
-                if (addressBoxList.status != 404) {
+                if (addressBoxList.status !== 404) {
                     const addressListFixed = parseUtxos(addressBoxList, true);
                     this.setState({
                         addressBoxList: addressListFixed
@@ -102,7 +109,7 @@ export default class TxBuilder extends React.Component {
     fetchByAddress() {
         unspentBoxesFor(this.state.searchAddress)
             .then(otherBoxList => {
-                if (otherBoxList.status != 404) {
+                if (otherBoxList.status !== 404) {
                     const otherBoxListFixed = parseUtxos(otherBoxList, true);
                     for (const box of otherBoxListFixed) {
                         this.setState(prevState => ({
@@ -117,7 +124,7 @@ export default class TxBuilder extends React.Component {
     fetchByBoxId() {
         boxById(this.state.searchBoxId)
             .then(box => {
-                if (box.status != 404) {
+                if (box.status !== 404) {
                     const boxFixed = parseUtxo(box, true);
                     this.setState(prevState => ({
                         otherBoxList: [...prevState.otherBoxList, boxFixed]
@@ -134,7 +141,7 @@ export default class TxBuilder extends React.Component {
         var alert = waitingAlert("Connecting to Yoroi...");
         connectYoroi().then(access_granted => {
             if (access_granted) {
-                alert.update({title: "Get Yoroi wallet content..."})
+                alert.update({ title: "Get Yoroi wallet content..." })
                 getAllUtxos().then(utxos => {
                     console.log("utxos", utxos)
                     this.setState({
@@ -157,7 +164,7 @@ export default class TxBuilder extends React.Component {
         if (!Array.isArray(box)) {
             var boxFound = false;
             for (const i in this.state.selectedBoxList) {
-                if (this.state.selectedBoxList[i].boxId == box.boxId) {
+                if (this.state.selectedBoxList[i].boxId === box.boxId) {
                     boxFound = true;
                 }
             }
@@ -173,7 +180,7 @@ export default class TxBuilder extends React.Component {
         if (!Array.isArray(box)) {
             var boxFound = false;
             for (const i in this.state.selectedDataBoxList) {
-                if (this.state.selectedDataBoxList[i].boxId == box.boxId) {
+                if (this.state.selectedDataBoxList[i].boxId === box.boxId) {
                     boxFound = true;
                 }
             }
@@ -287,7 +294,7 @@ export default class TxBuilder extends React.Component {
 
     async sendTxYoroi(tx) {
         const yoroiConnected = await connectYoroi();
-        console.log("sendTxYoroi",yoroiConnected);
+        console.log("sendTxYoroi", yoroiConnected);
         if (yoroiConnected) {
             const txSent = yoroiSignTx(tx)
             console.log("txSent", txSent)
@@ -304,15 +311,20 @@ export default class TxBuilder extends React.Component {
         };
     }
 
-    setTxJsonRaw(json) {
-        console.log("setTxJsonRaw", json);
+    setTxJsonRaw(textAreaInput) {
+        console.log("setTxJsonRaw", textAreaInput);
         var jsonFixed = {};
-        if (typeof json === 'string') {
-            jsonFixed = JSONBigInt.parse(json);
+        if (typeof textAreaInput === 'string'  ) {
+            if (textAreaInput.startsWith("{")) {
+                jsonFixed = JSONBigInt.stringify(JSONBigInt.parse(textAreaInput));
+            } else {
+                this.setState({ txJsonRaw: textAreaInput});
+                return;
+            }
         } else {
-            jsonFixed = json;
+            jsonFixed = JSONBigInt.stringify(textAreaInput, null, 2);
         }
-        this.setState({ txJsonRaw: JSONBigInt.stringify(jsonFixed, null, 2) });
+        this.setState({ txJsonRaw: jsonFixed});
     }
 
     setTxYoroiJsonRaw() {
@@ -321,9 +333,34 @@ export default class TxBuilder extends React.Component {
     setTxSwaggerJsonRaw() {
         this.setTxJsonRaw(generateSwaggerTx(this.getYoroiTx()));
     }
+    setTxReduced() {
+        getTxReduced(this.getYoroiTx(), this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.address).then(res => {
+            this.setState({
+                txReduced: res[0],
+                CSR: res[1],
+            });
+        })
+    }
+    resetTxReduced() {
+        this.setState({
+            txReduced: [],
+            CSR: [],
+        });
+    }
+
+    async loadTxReduced() {
+        console.log("loadTxReduced", this.state.txJsonRaw);
+        getTxJsonFromTxReduced(this.state.txJsonRaw).then(json => {
+            this.loadTxFromJson(json);
+        })
+    }
+
     async loadTxFromJsonRaw() {
         const json = JSONBigInt.parse(this.state.txJsonRaw);
-        console.log("loadTxFromJsonRaw", json)
+        await this.loadTxFromJson(json);
+    }
+
+    async loadTxFromJson(json) {
         var inputs = [];
         var dataInputs = [];
         var outputs = [];
@@ -347,7 +384,6 @@ export default class TxBuilder extends React.Component {
             console.log(e);
             errorAlert("Failed to parse transaction json", e)
         }
-
     }
 
     render() {
@@ -530,6 +566,22 @@ export default class TxBuilder extends React.Component {
                                 collapseStringsAfterLength={60}
                             />
 
+                            <div className="d-flex flex-column">
+                                <div className="d-flex flex-row">
+                                    <h6>Transaction reduced</h6> &nbsp;
+                                    <ImageButton id="get-reduced-tx" color="red" icon="restart_alt" tips="Reset reduced transaction"
+                                        onClick={this.resetTxReduced} />
+                                    <ImageButton id="get-reduced-tx" color="blue" icon="calculate" tips="Get reduced transaction and <br/> ColdSignigRequest"
+                                        onClick={this.setTxReduced} />
+                                </div>
+                                <textarea id='reducedTxTextArea' defaultValue={this.state.txReduced.join('') } readOnly = {true}/>
+                                <QRCodes list={this.state.txReduced} />
+                                <h6>Cold Signing Request (EIP-19)</h6>
+                                <textarea id='ColdSignigRequest' defaultValue={this.state.CSR.join('') } readOnly = {true}/>
+                                <QRCodes list={this.state.CSR} />
+                            </div>
+
+
                         </div>
                     </div>
 
@@ -537,10 +589,24 @@ export default class TxBuilder extends React.Component {
                         <div className="card p-1 m-2 w-100">
 
                             <h6>Transaction import/export</h6>
+                            <div className="d-flex flex-row p-1">
+                                <ImageButtonLabeled  id="get-yoroi-tx" color="blue" icon="download"
+                                    label="Get Yoroi format" onClick={this.setTxYoroiJsonRaw}
+                                />
+                                <ImageButtonLabeled id="get-swagger-tx" color="blue" icon="download"
+                                    label="Get Swagger format" onClick={this.setTxSwaggerJsonRaw}
+                                />
+                                <ImageButtonLabeled id="load-tx" color="blue" icon="upload"
+                                    label="Load transaction json" onClick={this.loadTxFromJsonRaw}
+                                />
+                                <ImageButtonLabeled id="load-tx" color="blue" icon="upload"
+                                    label="Load transaction reduced" onClick={this.loadTxReduced}
+                                />
+                            </div>
                             <CodeEditor
                                 value={this.state.txJsonRaw}
                                 language="json"
-                                placeholder="Please enter transaction json"
+                                placeholder="json or reduced transaction"
                                 onChange={(evn) => this.setTxJsonRaw(evn.target.value)}
                                 padding={10}
                                 style={{
@@ -549,31 +615,7 @@ export default class TxBuilder extends React.Component {
                                     fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
                                 }}
                             />
-                            <div className="d-flex flex-row p-1">
-                                <ImageButtonLabeled
-                                    id="get-yoroi-tx"
-                                    color="blue"
-                                    icon="download"
-                                    label="Get Yoroi format"
-                                    onClick={this.setTxYoroiJsonRaw}
-                                />
-                                <ImageButtonLabeled
-                                    id="get-swagger-tx"
-                                    color="blue"
-                                    icon="download"
-                                    label="Get Swagger format"
-                                    onClick={this.setTxSwaggerJsonRaw}
-                                />
-                                <ImageButtonLabeled
-                                    id="load-tx"
-                                    color="blue"
-                                    icon="upload"
-                                    label="Load transaction"
-                                    onClick={this.loadTxFromJsonRaw}
-                                />
-                            </div>
-
-                        </div>
+                         </div>
                     </div>
                 </div>
                 <br />

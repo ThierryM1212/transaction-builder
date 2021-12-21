@@ -66,3 +66,7 @@ tr td:last-child{
 .monospace {
   font-family: 'Source Code Pro', monospace;
 }
+
+#zoomable img:hover {
+  transform: scale(1.5);
+}

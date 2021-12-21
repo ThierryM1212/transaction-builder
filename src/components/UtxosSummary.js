@@ -4,7 +4,6 @@ export default function UtxosSummary(props) {
 
     const ergAmount = parseFloat(parseInt(getUtxosListValue(props.list)) / 1000000000).toFixed(4);
     const tokenDict = getTokenListFromUtxos(props.list);
-    console.log("UtxosSummary",Object.keys(tokenDict).length);
     return (
         <div className="card m-1 p-1" >
             <div className="d-flex flex-row">

@@ -4,7 +4,6 @@ import ImageButton from './ImageButton';
 import { formatLongString } from '../utils/utils';
 
 export function UtxoItem(props) {
-    console.log(props.id)
     return (
         <div className="d-flex flex-column m-1 p-1">
             { props.id !== undefined ? <h6>INPUTS({props.id})</h6> : null }

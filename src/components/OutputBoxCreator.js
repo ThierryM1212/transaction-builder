@@ -2,8 +2,6 @@ import React from 'react';
 import OutputEditable from './OutputEditable';
 import ImageButton from './ImageButton';
 import { encodeStr, encodeAddress, encodeInt, encodeLong, encodeLongArray, encodeContract } from '../ergo-related/serializer';
-import { currentHeight } from '../ergo-related/explorer';
-
 
 export default class OutputBoxCreator extends React.Component {
     constructor(props) {
