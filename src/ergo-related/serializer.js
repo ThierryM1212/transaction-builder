@@ -104,17 +104,10 @@ export async function encodeContract(address) {
     return tmp.ergo_tree().to_base16_bytes();
 }
 
-export async function getTxReduced(json, inputs, dataInputs, address) {
+export async function getTxReducedAndCSR(json, inputs, dataInputs, address) {
     console.log("getTxReduced", json, inputs, dataInputs);
-    // build ergolib objects from json
+    const reducedTx = await getTxReduced(json, inputs, dataInputs);
     // Reduced transaction is encoded with Base64
-    const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
-    const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
-    const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
-    const block_headers = (await ergolib).BlockHeaders.from_json(await getLastHeaders());
-    const pre_header = (await ergolib).PreHeader.from_block_header(block_headers.get(0));
-    const ctx = new (await ergolib).ErgoStateContext(pre_header, block_headers);
-    const reducedTx = (await ergolib).ReducedTransaction.from_unsigned_tx(unsignedTx,inputBoxes,inputDataBoxes,ctx);
     const txReducedBase64 = byteArrayToBase64(reducedTx.sigma_serialize_bytes());
 
     var inputsB64 = inputs.map(function (chunk) {
@@ -139,7 +132,49 @@ export async function getTxReduced(json, inputs, dataInputs, address) {
     return [txReducedBase64.match(/.{1,1000}/g), csrResult.match(/.{1,1000}/g)];
 }
 
+export async function getErgoStateContext() {
+    const block_headers = (await ergolib).BlockHeaders.from_json(await getLastHeaders());
+    const pre_header = (await ergolib).PreHeader.from_block_header(block_headers.get(0));
+    return new (await ergolib).ErgoStateContext(pre_header, block_headers);
+}
+
+export async function getTxReduced(json, inputs, dataInputs) {
+    // build ergolib objects from json
+    const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
+    const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
+    const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
+    const ctx = await getErgoStateContext();
+    
+    return (await ergolib).ReducedTransaction.from_unsigned_tx(unsignedTx,inputBoxes,inputDataBoxes,ctx);
+}
+
+export async function getTxReducedFromB64(txReducedB64) {
+    return (await ergolib).ReducedTransaction.sigma_parse_bytes(base64ToByteArray(txReducedB64));
+}
+
+
+
 export async function getTxJsonFromTxReduced(txReduced){
-    const reducedTx = (await ergolib).ReducedTransaction.sigma_parse_bytes(base64ToByteArray(txReduced));
-    return  reducedTx.unsigned_tx().to_js_eip12();
+    const reducedTx = await getTxReducedFromB64(txReduced);
+    console.log("getTxJsonFromTxReduced", reducedTx);
+    return await reducedTx.unsigned_tx().to_js_eip12();
+}
+
+export async function signTxReduced(txReducedB64, mnemonic) {
+    const reducedTx = await getTxReducedFromB64(txReducedB64);
+    console.log("signTxReduced", mnemonic)
+    const wallet = (await ergolib).Wallet.from_mnemonic(mnemonic, "");
+    const signedTx = wallet.sign_reduced_transaction(reducedTx);
+    return await signedTx.to_js_eip12();
+}
+
+export async function signTx(json, inputs, dataInputs, mnemonic) {
+    console.log("signTx", json, inputs, dataInputs, mnemonic)
+    const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
+    const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
+    const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
+    const wallet = (await ergolib).Wallet.from_mnemonic(mnemonic, "");
+    const ctx = await getErgoStateContext();
+    const signedTx = wallet.sign_transaction(ctx, unsignedTx, inputBoxes, inputDataBoxes);
+    return await signedTx.to_js_eip12();
 }

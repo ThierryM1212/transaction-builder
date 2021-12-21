@@ -14,7 +14,7 @@ import { unspentBoxesFor, boxById } from './ergo-related/explorer';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import { getAllUtxos, connectYoroi, getChangeAddress, yoroiSignTx } from './ergo-related/yoroi';
 import { parseUtxo, parseUtxos, generateSwaggerTx, enrichUtxos, buildBalanceBox } from './ergo-related/utxos';
-import { getTxReduced, getTxJsonFromTxReduced } from './ergo-related/serializer';
+import { getTxReducedAndCSR, getTxJsonFromTxReduced, signTxReduced, signTx } from './ergo-related/serializer';
 import JSONBigInt from 'json-bigint';
 import { errorAlert, waitingAlert } from './utils/Alerts';
 
@@ -58,6 +58,8 @@ export default class TxBuilder extends React.Component {
             txJsonRaw: '',
             txReduced: [],
             CSR: [],
+            signedTransaction: '',
+            mnemonic: '',
         };
         this.fetchUtxos = this.fetchUtxos.bind(this);
         this.fetchByBoxId = this.fetchByBoxId.bind(this);
@@ -83,6 +85,10 @@ export default class TxBuilder extends React.Component {
         this.setTxReduced = this.setTxReduced.bind(this);
         this.loadTxReduced = this.loadTxReduced.bind(this);
         this.resetTxReduced = this.resetTxReduced.bind(this);
+        this.setSignedTransaction = this.setSignedTransaction.bind(this);
+        this.setMnemonic = this.setMnemonic.bind(this);
+        this.signTxReduced = this.signTxReduced.bind(this);
+        this.signTx = this.signTx.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -135,6 +141,14 @@ export default class TxBuilder extends React.Component {
 
     setSearchAddress(address) {
         this.setState({ address: address });
+    }
+
+    setSignedTransaction(signedTransaction) {
+        this.setState({ signedTransaction: signedTransaction });
+    }
+
+    setMnemonic(mnemonic) {
+        this.setState({ mnemonic: mnemonic });
     }
 
     fetchYoroi() {
@@ -244,7 +258,7 @@ export default class TxBuilder extends React.Component {
     setBalanceBoxBoxJson = () => {
         buildBalanceBox(this.state.selectedBoxList, this.state.outputList, this.state.address).then(balanceBox => {
             console.log("balanceBox", balanceBox);
-            if (BigInt(balanceBox.value) < 100000) {
+            if (BigInt(balanceBox.value) < 10000) {
                 errorAlert("Not enough ERG in inputs");
             } else {
                 this.setState({ outputCreateJson: balanceBox });
@@ -314,17 +328,17 @@ export default class TxBuilder extends React.Component {
     setTxJsonRaw(textAreaInput) {
         console.log("setTxJsonRaw", textAreaInput);
         var jsonFixed = {};
-        if (typeof textAreaInput === 'string'  ) {
+        if (typeof textAreaInput === 'string') {
             if (textAreaInput.startsWith("{")) {
                 jsonFixed = JSONBigInt.stringify(JSONBigInt.parse(textAreaInput));
             } else {
-                this.setState({ txJsonRaw: textAreaInput});
+                this.setState({ txJsonRaw: textAreaInput });
                 return;
             }
         } else {
             jsonFixed = JSONBigInt.stringify(textAreaInput, null, 2);
         }
-        this.setState({ txJsonRaw: jsonFixed});
+        this.setState({ txJsonRaw: jsonFixed });
     }
 
     setTxYoroiJsonRaw() {
@@ -334,7 +348,7 @@ export default class TxBuilder extends React.Component {
         this.setTxJsonRaw(generateSwaggerTx(this.getYoroiTx()));
     }
     setTxReduced() {
-        getTxReduced(this.getYoroiTx(), this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.address).then(res => {
+        getTxReducedAndCSR(this.getYoroiTx(), this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.address).then(res => {
             this.setState({
                 txReduced: res[0],
                 CSR: res[1],
@@ -355,8 +369,25 @@ export default class TxBuilder extends React.Component {
         })
     }
 
+    async signTxReduced() {
+        console.log("signTxReduced", this.state.txReduced, this.state.mnemonic);
+        signTxReduced(this.state.txReduced, this.state.mnemonic).then(json => {
+            this.setSignedTransaction(json);
+        })
+    }
+
+    async signTx() {
+
+        const unsignedJson = this.getYoroiTx();
+        console.log("signTx", unsignedJson, this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.mnemonic);
+        signTx(unsignedJson, this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.mnemonic).then(json => {
+            this.setSignedTransaction(json);
+        })
+    }
+
     async loadTxFromJsonRaw() {
         const json = JSONBigInt.parse(this.state.txJsonRaw);
+        console.log("loadTxFromJsonRaw", json);
         await this.loadTxFromJson(json);
     }
 
@@ -574,12 +605,12 @@ export default class TxBuilder extends React.Component {
                                     <ImageButton id="get-reduced-tx" color="blue" icon="calculate" tips="Get reduced transaction and <br/> ColdSignigRequest"
                                         onClick={this.setTxReduced} />
                                 </div>
-                                <textarea id='reducedTxTextArea' defaultValue={this.state.txReduced.join('') } readOnly = {true}/>
+                                <textarea id='reducedTxTextArea' defaultValue={this.state.txReduced.join('')} readOnly={true} />
                                 <QRCodes list={this.state.txReduced} />
                                 <h6>Cold Signing Request (EIP-19)</h6>
-                                <textarea id='ColdSignigRequest' defaultValue={this.state.CSR.join('') } readOnly = {true}/>
+                                <textarea id='ColdSignigRequest' defaultValue={this.state.CSR.join('')} readOnly={true} />
                                 <QRCodes list={this.state.CSR} />
-                            </div>
+                               </div>
 
 
                         </div>
@@ -590,7 +621,7 @@ export default class TxBuilder extends React.Component {
 
                             <h6>Transaction import/export</h6>
                             <div className="d-flex flex-row p-1">
-                                <ImageButtonLabeled  id="get-yoroi-tx" color="blue" icon="download"
+                                <ImageButtonLabeled id="get-yoroi-tx" color="blue" icon="download"
                                     label="Get Yoroi format" onClick={this.setTxYoroiJsonRaw}
                                 />
                                 <ImageButtonLabeled id="get-swagger-tx" color="blue" icon="download"
@@ -615,7 +646,34 @@ export default class TxBuilder extends React.Component {
                                     fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
                                 }}
                             />
-                         </div>
+                        </div>
+                    </div>
+
+                    <br /><br /><br /><br /><br /><br /><br />
+                    <div className="w-100 container-xxl ">
+                        <div className="card p-1 m-2 w-100">
+                            <div className="d-flex flex-row p-1">
+                                <h6>Experimental - Sign Transaction with mnemonic</h6>
+                                <ImageButtonLabeled id="sign-reduced-tx" color="blue" icon="upload"
+                                    label="Sign reduced transaction" onClick={this.signTxReduced}
+                                />
+                                <ImageButtonLabeled id="sign-tx" color="blue" icon="upload"
+                                    label="Sign json transaction" onClick={this.signTx}
+                                />
+                            </div>
+                            <InputString label="Mnemonic"
+                                value={this.state.mnemonic}
+                                onChange={this.setMnemonic}
+                            />
+                            { this.state.signedTransaction !== '' ?
+                                <div>
+                                <h6>Signed transaction</h6>
+                                <textarea id='signedTx' defaultValue={this.state.signedTransaction} readOnly={true} />
+                                </div>
+                                : null
+                            }
+                            
+                        </div>
                     </div>
                 </div>
                 <br />

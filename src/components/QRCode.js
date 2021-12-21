@@ -21,14 +21,13 @@ export default class QR extends React.Component {
     }
 
     render() {
-
         return (
             <div className="m-1 p-1 ">
             {
                this.state.value !== '' ? 
                <QRCode value={this.state.value} 
                size={this.state.size} 
-               includeMargin="true" onClick={this.zoomInOut}/> : null
+               includeMargin={true} onClick={this.zoomInOut}/> : null
             }
         </div>
         )
