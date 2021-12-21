@@ -370,7 +370,6 @@ export default class TxBuilder extends React.Component {
     }
 
     async signTxReduced() {
-        console.log("signTxReduced", this.state.txReduced, this.state.mnemonic);
         signTxReduced(this.state.txReduced, this.state.mnemonic).then(json => {
             this.setSignedTransaction(json);
         })
@@ -379,7 +378,6 @@ export default class TxBuilder extends React.Component {
     async signTx() {
 
         const unsignedJson = this.getYoroiTx();
-        console.log("signTx", unsignedJson, this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.mnemonic);
         signTx(unsignedJson, this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.mnemonic).then(json => {
             this.setSignedTransaction(json);
         })

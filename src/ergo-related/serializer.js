@@ -162,14 +162,12 @@ export async function getTxJsonFromTxReduced(txReduced){
 
 export async function signTxReduced(txReducedB64, mnemonic) {
     const reducedTx = await getTxReducedFromB64(txReducedB64);
-    console.log("signTxReduced", mnemonic)
     const wallet = (await ergolib).Wallet.from_mnemonic(mnemonic, "");
     const signedTx = wallet.sign_reduced_transaction(reducedTx);
     return await signedTx.to_js_eip12();
 }
 
 export async function signTx(json, inputs, dataInputs, mnemonic) {
-    console.log("signTx", json, inputs, dataInputs, mnemonic)
     const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
     const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
     const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
