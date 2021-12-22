@@ -120,7 +120,7 @@ export async function getTxReducedAndCSR(json, inputs, dataInputs, address) {
         "inputs": inputsB64
     };
     const csrDictStr = JSONBigInt.stringify(csrDict);
-    var pageNumber = Math.round(csrDictStr.length/1000);
+    var pageNumber = Math.floor(csrDictStr.length/1000);
     if (csrDictStr.length%1000 !== 0) {pageNumber++};
     var csrResult = "CSR";
     if (pageNumber > 1) {
