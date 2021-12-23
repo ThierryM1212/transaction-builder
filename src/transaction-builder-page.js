@@ -138,10 +138,10 @@ export default class TxBuilder extends React.Component {
         boxById(this.state.searchBoxId)
             .then(box => {
                 //if (box.status !== 404) {
-                    const boxFixed = parseUtxo(box, true);
-                    this.setState(prevState => ({
-                        otherBoxList: [...prevState.otherBoxList, boxFixed]
-                    }))
+                const boxFixed = parseUtxo(box, true);
+                this.setState(prevState => ({
+                    otherBoxList: [...prevState.otherBoxList, boxFixed]
+                }))
                 //}
             }).catch((e) => {
                 console.log(e);
@@ -240,15 +240,10 @@ export default class TxBuilder extends React.Component {
     }
 
     addOutputBox() {
-        if (parseInt(this.state.outputCreateJson) > 10000) {
-            this.setState(prevState => ({
-                outputList: [...prevState.outputList, prevState.outputCreateJson]
-            }))
-            this.resetCreateBoxJson();
-        } else {
-            errorAlert("Not enough ERG in the output box.")
-        }
-        
+        this.setState(prevState => ({
+            outputList: [...prevState.outputList, prevState.outputCreateJson]
+        }))
+        this.resetCreateBoxJson();
     }
 
     setCreateBoxJson = (key, json) => {
@@ -582,7 +577,7 @@ export default class TxBuilder extends React.Component {
                                     </div>
                                 ))}
                             </div>
-                            <UtxosSummary list={this.state.selectedBoxList} name="inputs" label="Selected inputs list"/>
+                            <UtxosSummary list={this.state.selectedBoxList} name="inputs" label="Selected inputs list" />
                         </div>
                     </div>
 
