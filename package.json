@@ -12,7 +12,6 @@
     "@types/node": "^12.19.14",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
-    "@uiw/react-textarea-code-editor": "^1.4.14",
     "array-move": "^4.0.0",
     "ergo-lib-wasm-browser": "^0.15.0-alpha-f5b536d",
     "json-bigint": "^1.0.0",

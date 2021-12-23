@@ -19,12 +19,12 @@ async function postRequest(url, body = {}, apiKey = '') {
 }
 
 export async function getLastHeaders() {
-    return await getRequest('/blocks/')
+    return await getRequest('/blocks')
         .then(res => res.data)
 }
 
 export async function sendTx(json) {
     console.log(json);
-    return await postRequest('/transactions/', JSON.parse(json) )
+    return await postRequest('/transactions', json )
         .then(res => res.data)
 }

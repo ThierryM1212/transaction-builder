@@ -5,9 +5,9 @@ export async function post(url, body = {}, apiKey = '') {
         headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json',
-            'api_key': apiKey,
             'mode': 'cors',
-
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
         },
         body: JSON.stringify(body)
     });
