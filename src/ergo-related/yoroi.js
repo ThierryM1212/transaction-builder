@@ -57,20 +57,19 @@ export async function yoroiSignTx(tx) {
     }
 }
 
-async function signTx(txToBeSigned) {
+export async function signTx(txToBeSigned) {
     try {
         console.log("signTx", txToBeSigned);
         return await ergo.sign_tx(txToBeSigned);
     } catch (e) {
-
         console.log(e);
         return null;
     }
 }
 
-async function submitTx(txToBeSubmitted) {
+export async function submitTx(txToBeSubmitted) {
     try {
-        console.log("submitTx");
+        console.log("submitTx", txToBeSubmitted);
         return await ergo.submit_tx(txToBeSubmitted);
     } catch (e) {
         console.log(e);

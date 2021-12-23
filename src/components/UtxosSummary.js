@@ -23,7 +23,7 @@ export default function UtxosSummary(props) {
                     }
                 </tbody>
             </table>
-            : <h6>No token in selected input boxes</h6>
+            : <h6>No token in selected {props.name} boxes</h6>
             }
             
         </div>

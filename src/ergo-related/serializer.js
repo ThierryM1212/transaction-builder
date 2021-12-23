@@ -167,7 +167,7 @@ export async function signTxReduced(txReducedB64, mnemonic) {
     return await signedTx.to_js_eip12();
 }
 
-export async function signTx(json, inputs, dataInputs, mnemonic) {
+export async function signTxWithMnemonic(json, inputs, dataInputs, mnemonic) {
     const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
     const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
     const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
@@ -176,3 +176,15 @@ export async function signTx(json, inputs, dataInputs, mnemonic) {
     const signedTx = wallet.sign_transaction(ctx, unsignedTx, inputBoxes, inputDataBoxes);
     return await signedTx.to_js_eip12();
 }
+
+//export async function signTx(json, inputs, dataInputs, mnemonic) {
+//    const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
+//    const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
+//    const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
+//    var secrets = new (await ergolib).SecretKeys();
+//    const secret = (await ergolib).SecretKey.from
+//    const wallet = (await ergolib).Wallet.from_mnemonic(mnemonic, "");
+//    const ctx = await getErgoStateContext();
+//    const signedTx = wallet.sign_transaction(ctx, unsignedTx, inputBoxes, inputDataBoxes);
+//    return await signedTx.to_js_eip12();
+//}

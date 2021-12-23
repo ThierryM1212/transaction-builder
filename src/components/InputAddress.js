@@ -3,12 +3,13 @@ import ImageButtonLabeled from "./ImageButtonLabeled"
 
 
 export default function InputAddress(props) {
+    
     return (
         <div className="flew-row d-flex align-items-center">
-            <label htmlFor="ref" >{props.label}:&nbsp;</label>
+            <label htmlFor="input-address" >{props.label}:&nbsp;</label>
             <div className="col-sm">
             <input className="form-control grey-input"
-                id="ref"
+                id="input-address"
                 pattern="[a-zA-Z0-9]*"
                 onChange={e => props.onChange(e.target.value)}
                 value={props.value} />

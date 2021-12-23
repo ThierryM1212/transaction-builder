@@ -242,7 +242,7 @@ export default class OutputBoxCreator extends React.Component {
 
                 <div className="card p-1 m-1">
                     <div className="d-flex ">
-                        <h6>New OUTPUT</h6>
+                        <h6>New OUTPUT box</h6>
                         &nbsp;
                         <div className="d-flex flex-row">
                             <ImageButton id="reset" color="red" onClick={this.state.reset} icon="restart_alt" tips="Reset" />

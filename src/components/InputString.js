@@ -4,9 +4,9 @@ import ImageButton from "./ImageButton"
 
 export default function InputString(props) {
     return (
-        <div className="flew-row d-flex align-items-center p-1">
+        <div className="flew-row d-flex align-content-center p-1">
             
-            <label className="col-sm-3" htmlFor="ref" >{props.label}:&nbsp;</label>
+            <label className="col-sm" htmlFor="ref" >{props.label}:&nbsp;</label>
             <div className="col-sm">
             <input className="form-control grey-input"
                 id="ref"
