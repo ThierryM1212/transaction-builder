@@ -15,3 +15,19 @@ $ npm start<br/>
 # Build static prod version
 $ npm run build
 
+# Apache proxy configuration to open the node used URLs
+```
+    <Location "/blocks">
+        ProxyPreserveHost On
+        ProxyPass http://localhost:9053/blocks/lastHeaders/10
+        ProxyPassReverse http://localhost:9053/blocks/lastHeaders/10
+    </Location>
+
+    <Location "/transactions">
+        ProxyPreserveHost On
+        ProxyPass http://localhost:9053/transactions
+        ProxyPassReverse http://localhost:9053/transactions
+        RequestHeader set api_key "YOUR_API_KEY"
+    </Location>
+
+```

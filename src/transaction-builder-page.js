@@ -90,6 +90,7 @@ export default class TxBuilder extends React.Component {
         this.signTxReduced = this.signTxReduced.bind(this);
         this.signTx = this.signTx.bind(this);
         this.sendTxNode = this.sendTxNode.bind(this);
+        this.sendTxYoroi = this.sendTxYoroi.bind(this);
         this.signTxJsonMnemonic = this.signTxJsonMnemonic.bind(this);
         this.loadSignedTxFromJson = this.loadSignedTxFromJson.bind(this);
     }
@@ -372,10 +373,10 @@ export default class TxBuilder extends React.Component {
     }
 
     setTxYoroiJsonRaw() {
-        this.setTxJsonRaw(this.getYoroiTx());
+        this.setTxJsonRaw(JSONBigInt.stringify(this.getYoroiTx()));
     }
     setTxSwaggerJsonRaw() {
-        this.setTxJsonRaw(generateSwaggerTx(this.getYoroiTx()));
+        this.setTxJsonRaw(JSONBigInt.stringify(generateSwaggerTx(this.getYoroiTx())));
     }
     setTxReduced() {
         getTxReducedAndCSR(this.getYoroiTx(), this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.address).then(res => {
