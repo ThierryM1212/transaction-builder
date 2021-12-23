@@ -12,7 +12,7 @@ export default function ImageButton(props) {
             >
                 {props.icon}
             </span>
-            <ReactTooltip id={props.id} place="top" effect="solid" html={true}>
+            <ReactTooltip id={props.id} place="top" effect="solid" html={true} >
                 {props.tips}
             </ReactTooltip>
             &nbsp;

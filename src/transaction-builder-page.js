@@ -8,6 +8,7 @@ import TransactionSummary from './components/TransactionSummary';
 import ImageButton from './components/ImageButton';
 import ImageButtonLabeled from './components/ImageButtonLabeled';
 import QRCodes from './components/QRCodes';
+import Footer from './components/Footer';
 import ReactJson from 'react-json-view';
 import { UtxoItem } from './components/UtxoItem';
 import { unspentBoxesFor, boxById } from './ergo-related/explorer';
@@ -465,15 +466,26 @@ export default class TxBuilder extends React.Component {
         var swaggertips = "This transaction can be signed using your node wallet and swagger UI:<br />";
         swaggertips += "- Unlock the wallet using: $SWAGGER/wallet/unlock/<br />";
         swaggertips += "- Sign the transaction copying the Swagger json to $SWAGGER/wallet/transaction/sign<br />";
-        swaggertips += "- Send the transaction copying the signed json to $SWAGGER/transactions";
+        swaggertips += "- Send the transaction copying the signed json to $SWAGGER/transactions<br />";
         swaggertips += "This should be used after having add the fee box.";
 
+        var appTips = "The application is intended to manipulate json of Ergo transaction to build smart contracts.<br />";
+        appTips += "Features:<br />";
+        appTips += " - Get unspent boxes from Explorer or Yoroi<br />";
+        appTips += " - Get boxes by address or boxId to execute smart contracts<br />";
+        appTips += " - Build output boxes with the editor<br />";
+        appTips += " - Sign the transaction with Yoroi or Mnemonic (will work soon)<br />";
+        appTips += " - Send transaction to Yoroi or local Ergo node";
 
         return (
 
             <Fragment >
                 <div className="w-100 container">
-                    <h4>Transaction builder</h4>
+                <div className="d-flex flex-row justify-content-center">
+                    <h4>Transaction builder</h4>&nbsp;
+                    <ImageButton id="help-tx-builder" icon="help_outline"
+                                        tips={appTips} />
+                    </div>
                     <div className="w-100 container-xxl ">
                         <div className="card p-1 m-2 w-100">
                             <InputAddress label="ERG address"
@@ -728,6 +740,7 @@ export default class TxBuilder extends React.Component {
 
                 </div>
                 <br />
+                <Footer />
             </Fragment>
         )
     }
