@@ -18,9 +18,13 @@ export async function connectYoroi() {
     const alreadyConnected = await isYoroiConnected();
     console.log('connectYoroi', alreadyConnected);
     if (!alreadyConnected) {
-        return await window.ergo_request_read_access().then(access_granted => {
-            return access_granted;
-        });
+        try{
+            return await window.ergo_request_read_access().then(access_granted => {
+                return access_granted;
+            });
+        } catch (e) {
+            errorAlert("Yoroi nightly extension not found", e);
+        }
     } else return alreadyConnected;
 }
 
