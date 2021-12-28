@@ -145,12 +145,11 @@ export function getMissingTokens(inputs, outputs) {
 
 export function buildTokenList(tokens) {
     var res = [];
-    console.log("buildTokenList",tokens);
     if (tokens !== {}) {
         for (const i in tokens) {
-            res.push({ "tokenId": i, "amount": tokens[i] });
+            res.push({ "tokenId": i, "amount": tokens[i].toString() });
         }
-    }
+    };
     return res;
 }
 
