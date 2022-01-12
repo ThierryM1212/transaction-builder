@@ -82,16 +82,33 @@ function parseInputSwagger(input) {
     }
 }
 
+function parseSignedInputSwagger(input) {
+    return {
+        boxId: input.boxId,
+        spendingProof: input.spendingProof,
+        extension: {},
+    }
+}
+
 export function generateSwaggerTx(json) {
+    console.log("generateSwaggerTx",json);
     var res = {};
-    res.tx = {};
+
     var newInsputs = [];
     for (const input of json.inputs) {
-        newInsputs.push(parseInputSwagger(input));
+        newInsputs.push(parseSignedInputSwagger(input));
     }
-    res.tx.inputs = newInsputs;
-    res.tx.dataInputs = json.dataInputs;
-    res.tx.outputs = json.outputs;
+    if (json.hasOwnProperty("tx_id")) {
+        res["id"] = json.tx_id;
+    }
+    res["inputs"] = newInsputs;
+    if (json.hasOwnProperty("data_inputs")) {
+        res["dataInputs"] = json.data_inputs;
+    } else {
+        res["dataInputs"] = json.dataInputs;
+    }
+    
+    res["outputs"] = json.outputs;
     return res;
 }
 

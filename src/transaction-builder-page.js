@@ -405,16 +405,20 @@ export default class TxBuilder extends React.Component {
     }
 
     async signTxReduced() {
-        signTxReduced(this.state.txReduced, this.state.mnemonic).then(json => {
+        signTxReduced(this.state.txReduced, this.state.mnemonic, this.state.address).then(json => {
             console.log("signTxReduced", json)
             this.setSignedTransaction(json);
         })
     }
 
     async signTxJsonMnemonic() {
-        signTxWithMnemonic(this.getYoroiTx(), this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.mnemonic).then(json => {
-            this.setSignedTransaction(json);
-        })
+        try {
+            const res = await signTxWithMnemonic(this.getYoroiTx(), this.state.selectedBoxList, this.state.selectedDataBoxList, this.state.mnemonic, this.state.address);
+            console.log("signTxJsonMnemonic", res);
+            this.setSignedTransaction(generateSwaggerTx(res));
+        } catch(e) {
+            errorAlert("Failed to sign transaction", e);
+        }
     }
 
     async signTx() {
@@ -425,10 +429,17 @@ export default class TxBuilder extends React.Component {
     }
 
     async sendTxNode() {
-        console.log("sendTxNode", generateSwaggerTx(this.state.signedTransaction));
-        sendTx(generateSwaggerTx(this.state.signedTransaction)).then(txId => {
-            displayTransaction(txId);
-        });
+        const res = await sendTx(this.state.signedTransaction);
+        console.log("sendTxNode", res);
+        if (res.hasOwnProperty("ok")) {
+            if (res.ok) {
+                displayTransaction(this.state.signedTransaction.id);
+            } else {
+                errorAlert("Failed to send transaction to node", JSON.stringify(res))
+            }
+        } else {
+            errorAlert("Failed to send transaction to node", JSON.stringify(res))
+        }
     }
 
     async loadTxFromJsonRaw() {
@@ -482,10 +493,10 @@ export default class TxBuilder extends React.Component {
 
             <Fragment >
                 <div className="w-100 container">
-                <div className="d-flex flex-row justify-content-center">
-                    <h4>Transaction builder</h4>&nbsp;
-                    <ImageButton id="help-tx-builder" icon="help_outline"
-                                        tips={appTips} />
+                    <div className="d-flex flex-row justify-content-center">
+                        <h4>Transaction builder</h4>&nbsp;
+                        <ImageButton id="help-tx-builder" icon="help_outline"
+                            tips={appTips} />
                     </div>
                     <div className="w-100 container-xxl ">
                         <div className="card p-1 m-2 w-100">
@@ -633,7 +644,7 @@ export default class TxBuilder extends React.Component {
                                         onClick={() => { this.signAndSendTxYoroi(txJson); }} />
                                     <ImageButton id="sign-yoroi" color="blue" icon="border_color" tips="Sign transaction with Yoroi"
                                         onClick={() => { this.signTxYoroi(txJson); }} />
-                                    <ImageButton id="sign-mnemonic" color="orange" icon="border_color" tips="KO - Sign with mnemonic"
+                                    <ImageButton id="sign-mnemonic" color="orange" icon="border_color" tips="Sign with mnemonic"
                                         onClick={this.signTxJsonMnemonic} />
                                     <ImageButton id="help-swagger" icon="help_outline"
                                         tips={swaggertips} />
@@ -659,7 +670,7 @@ export default class TxBuilder extends React.Component {
                                         onClick={this.resetTxReduced} />
                                     <ImageButton id="set-reduced-tx" color="blue" icon="calculate" tips="Get reduced transaction and <br/> ColdSignigRequest"
                                         onClick={this.setTxReduced} />
-                                    <ImageButton id="sign-mnemonic" color="orange" icon="border_color" tips="KO - Sign reduced transaction with mnemonic"
+                                    <ImageButton id="sign-reduced-mnemonic" color="orange" icon="border_color" tips="Sign reduced transaction with mnemonic"
                                         onClick={this.signTxReduced} />
                                 </div>
                                 {

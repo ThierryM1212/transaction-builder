@@ -160,21 +160,72 @@ export async function getTxJsonFromTxReduced(txReduced){
     return await reducedTx.unsigned_tx().to_js_eip12();
 }
 
-export async function signTxReduced(txReducedB64, mnemonic) {
+export async function signTxReduced(txReducedB64, mnemonic, address) {
     const reducedTx = await getTxReducedFromB64(txReducedB64);
-    const wallet = (await ergolib).Wallet.from_mnemonic(mnemonic, "");
+    const wallet = await getWalletForAddress(mnemonic, address);
     const signedTx = wallet.sign_reduced_transaction(reducedTx);
     return await signedTx.to_js_eip12();
 }
 
-export async function signTxWithMnemonic(json, inputs, dataInputs, mnemonic) {
+const deriveSecretKey = (rootSecret, path) =>
+    rootSecret.derive(path); 
+
+const nextPath = (rootSecret, lastPath) => 
+    rootSecret.derive(lastPath).path().next();
+
+
+export async function signTxWithMnemonic(json, inputs, dataInputs, mnemonic, address) {
     const unsignedTx = (await ergolib).UnsignedTransaction.from_json(JSONBigInt.stringify(json));
     const inputBoxes = (await ergolib).ErgoBoxes.from_boxes_json(inputs);
     const inputDataBoxes = (await ergolib).ErgoBoxes.from_boxes_json(dataInputs);
-    const wallet = (await ergolib).Wallet.from_mnemonic(mnemonic, "");
+
+    const wallet = await getWalletForAddress(mnemonic, address);
+    console.log("wallet",wallet);
     const ctx = await getErgoStateContext();
     const signedTx = wallet.sign_transaction(ctx, unsignedTx, inputBoxes, inputDataBoxes);
     return await signedTx.to_js_eip12();
+}
+
+async function getWalletForAddress (mnemonic, address) {
+    const seed = (await ergolib).Mnemonic.to_seed(mnemonic, "");
+    const rootSecret = (await ergolib).ExtSecretKey.derive_master(seed);
+
+    const changePath = await getDerivationPathForAddress(rootSecret, address);
+    console.log("changePath",changePath.toString());
+    const changeSecretKey = deriveSecretKey(rootSecret, changePath);
+    //const changePubKey = changeSecretKey.public_key();
+    //const changeAddress = (await ergolib).NetworkAddress.new((await ergolib).NetworkPrefix.Mainnet, changePubKey.to_address());
+    //console.log(`address: ${changeAddress.to_base58()}`);
+    
+    const dlogSecret = (await ergolib).SecretKey.dlog_from_bytes(changeSecretKey.secret_key_bytes());
+    const secretKeys = new (await ergolib).SecretKeys();
+    secretKeys.add(dlogSecret);
+
+    const wallet = (await ergolib).Wallet.from_secrets(secretKeys);
+    console.log("wallet",wallet);
+    return wallet;
+}
+
+async function getDerivationPathForAddress(rootSecret, address) {
+    let path = (await ergolib).DerivationPath.new(0, new Uint32Array([0]));
+    var i = 0, j = 0, found = false;
+    while (i<100 && !found) {
+        while (j<100 && !found) {
+            let path = (await ergolib).DerivationPath.new(i, new Uint32Array([j]));
+            const changeSecretKey = deriveSecretKey(rootSecret, path);
+            const changePubKey = changeSecretKey.public_key();
+            const changeAddress = (await ergolib).NetworkAddress.new((await ergolib).NetworkPrefix.Mainnet, changePubKey.to_address()).to_base58();
+            if (changeAddress === address) {
+                found = true;
+                break;
+            }
+            j++;
+        }
+        if (!found) i++;
+    }
+    path = (await ergolib).DerivationPath.new(i, new Uint32Array([j]));
+
+    return path;
 }
 
 //export async function signTx(json, inputs, dataInputs, mnemonic) {

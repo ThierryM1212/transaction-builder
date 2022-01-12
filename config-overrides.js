@@ -1,4 +1,15 @@
 const path = require('path');
+const {overrideDevServer} = require("customize-cra");
+
+const devServerConfig = () => config => {
+  return {
+     ...config,
+     // webpackDevService doesn't write the files to desk
+     // so we need to tell it to do so so we can load the
+     // extension with chrome
+     writeToDisk: true
+  }
+}
 
 module.exports = function override(config, env) {
   const wasmExtensionRegExp = /\.wasm$/;
@@ -23,3 +34,5 @@ module.exports = function override(config, env) {
 
   return config;
 };
+
+module.exports["devServer"] = overrideDevServer(devServerConfig());

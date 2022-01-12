@@ -13,7 +13,7 @@
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
     "array-move": "^4.0.0",
-    "ergo-lib-wasm-browser": "^0.15.0-alpha-f5b536d",
+    "ergo-lib-wasm-browser": "^0.15.0-alpha-6e17f13",
     "json-bigint": "^1.0.0",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.1",
@@ -51,6 +51,7 @@
     ]
   },
   "devDependencies": {
+    "customize-cra": "^1.0.0",
     "react-app-rewired": "^2.1.8",
     "wasm-loader": "^1.3.0"
   }

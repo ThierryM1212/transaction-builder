@@ -7,14 +7,17 @@ import { get, post } from './rest';
 export const nodeApi = 'https://transaction-builder.ergo.ga';
 
 async function getRequest(url) {
-    return get(nodeApi + url).then(res => {
+    return await get(nodeApi + url).then(res => {
         return { data: res };
     });
 }
 
 async function postRequest(url, body = {}, apiKey = '') {
-    return post(nodeApi + url, body).then(res => {
+    return await post(nodeApi + url, body).then(res => {
         return { data: res };
+    }).catch(err => {
+        console.log("postRequest", err);
+        return { data: err.toString() }
     });
 }
 
@@ -24,7 +27,6 @@ export async function getLastHeaders() {
 }
 
 export async function sendTx(json) {
-    console.log(json);
-    return await postRequest('/transactions', json )
-        .then(res => res.data)
+    const res = await postRequest('/transactions', json);
+    return res.data;
 }

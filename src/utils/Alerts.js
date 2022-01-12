@@ -35,7 +35,7 @@ export function displayTransaction(txId) {
         title: <p>Transaction sent succesfully</p>,
         allowOutsideClick: false,
         icon: 'success',
-        html: `<p>The transaction will be visible in your wallet and in the explorer in few seconds: <a href="https://explorer.ergoplatform.com/en/transactions/${txId} target="_blank" > ${txId} </a></p>`,
+        html: `<p>The transaction will be visible in your wallet and in the explorer in few seconds: <a href="https://explorer.ergoplatform.com/en/transactions/${txId}" target="_blank" > ${txId} </a></p>`,
     });
     return MySwal;
 }
