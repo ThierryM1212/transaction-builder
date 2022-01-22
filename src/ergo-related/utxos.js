@@ -5,6 +5,7 @@ import { encodeContract } from "./serializer";
 /* global BigInt */
 
 export function parseUtxo(json, addExtention = true, mode = 'input') {
+    console.log(json)
     if (json === undefined) {
         return {};
     }
@@ -19,10 +20,16 @@ export function parseUtxo(json, addExtention = true, mode = 'input') {
     
     res["value"] = json.value.toString();
     res["ergoTree"] = json.ergoTree;
-    res["assets"] = json.assets.map(asset => ({
-        tokenId: asset.tokenId,
-        amount: asset.amount.toString(),
-    }));
+
+    if (Array.isArray(json.assets)){
+        res["assets"] = json.assets.map(asset => ({
+            tokenId: asset.tokenId,
+            amount: asset.amount.toString(),
+        }));
+    } else {
+        res["assets"] = [];
+    }
+
     res["additionalRegisters"] = parseAdditionalRegisters(json.additionalRegisters);
     res["creationHeight"] = json.creationHeight;
 
@@ -42,6 +49,7 @@ export function parseUtxo(json, addExtention = true, mode = 'input') {
 }
 
 export function parseUtxos(utxos, addExtention, mode = 'input') {
+    
     var utxosFixed = [];
     for (const i in utxos) {
         utxosFixed.push(parseUtxo(utxos[i], addExtention, mode))
