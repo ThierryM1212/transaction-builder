@@ -3,7 +3,7 @@ import { get, post } from './rest';
 // in order to secure the node requests (port 9053) the following setting have been done on apache
 // prevent any connection to 9053 except from localhost
 
-export const nodeApi = 'http://213.239.193.208:9053';
+export const nodeApi = 'https://149.202.46.53';
 
 async function getRequest(url) {
     return await get(nodeApi + url).then(res => {

@@ -2,6 +2,7 @@
   "name": "ergo-template",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/txbuilder/",
   "dependencies": {
     "@coinbarn/ergo-ts": "^0.3.0",
     "@sweetalert2/theme-dark": "^5.0.8",
