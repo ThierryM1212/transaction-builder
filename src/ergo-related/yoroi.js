@@ -57,7 +57,7 @@ export async function yoroiSignTx(tx) {
         })
     } else {
         closeAlert(alert);
-        console.log('Yoroi access denied');
+        console.log('Wallet access denied');
     }
 }
 

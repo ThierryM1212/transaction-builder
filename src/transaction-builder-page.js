@@ -163,10 +163,10 @@ export default class TxBuilder extends React.Component {
     }
 
     fetchYoroi() {
-        var alert = waitingAlert("Connecting to Yoroi...");
+        var alert = waitingAlert("Connecting to wallet...");
         connectYoroi().then(access_granted => {
             if (access_granted) {
-                alert.update({ title: "Get Yoroi wallet content..." })
+                alert.update({ title: "Get wallet content..." })
                 getAllUtxos().then(utxos => {
                     console.log("utxos", utxos)
                     this.setState({
@@ -179,8 +179,8 @@ export default class TxBuilder extends React.Component {
                     })
                 )
             } else {
-                console.log("Yoroi access failed");
-                errorAlert("Yoroi access failed");
+                console.log("Wallet access failed");
+                errorAlert("Wallet access failed");
             }
         })
     }
@@ -324,12 +324,12 @@ export default class TxBuilder extends React.Component {
             const txSent = yoroiSignTx(this.getYoroiTx());
             console.log("signAndSendTxYoroi txSent", txSent);
         } else {
-            console.log("Not connected to Yoroi");
+            console.log("Not connected to wallet");
         }
     }
 
     async signTxYoroi() {
-        var alert = waitingAlert("Connecting to Yoroi...");
+        var alert = waitingAlert("Connecting wallet...");
         const yoroiConnected = await connectYoroi();
         console.log("signTxYoroi", yoroiConnected);
         if (yoroiConnected) {
@@ -339,13 +339,13 @@ export default class TxBuilder extends React.Component {
             console.log("signTxYoroi txSigned", txSigned);
             alert.close();
         } else {
-            console.log("Not connected to Yoroi");
-            errorAlert("Not connected to Yoroi");
+            console.log("Not connected to wallet");
+            errorAlert("Not connected to wallet");
         }
     }
 
     async sendTxYoroi() {
-        var alert = waitingAlert("Connecting to Yoroi...");
+        var alert = waitingAlert("Connecting wallet...");
         const yoroiConnected = await connectYoroi();
         console.log("sendTxYoroi", yoroiConnected);
         if (yoroiConnected) {
@@ -355,8 +355,8 @@ export default class TxBuilder extends React.Component {
             displayTransaction(txSubmitted);
             alert.close();
         } else {
-            console.log("Not connected to Yoroi");
-            errorAlert("Not connected to Yoroi");
+            console.log("Not connected to wallet");
+            errorAlert("Not connected to wallet");
         }
     }
 
@@ -483,11 +483,11 @@ export default class TxBuilder extends React.Component {
 
         var appTips = "The application is intended to manipulate json of Ergo transaction to build smart contracts.<br />";
         appTips += "Features:<br />";
-        appTips += " - Get unspent boxes from Explorer or Yoroi<br />";
+        appTips += " - Get unspent boxes from Explorer or browser extension wallet<br />";
         appTips += " - Get boxes by address or boxId to execute smart contracts<br />";
         appTips += " - Build output boxes with the editor<br />";
-        appTips += " - Sign the transaction with Yoroi or Mnemonic (will work soon)<br />";
-        appTips += " - Send transaction to Yoroi or local Ergo node";
+        appTips += " - Sign the transaction with dApp connector or Mnemonic<br />";
+        appTips += " - Send transaction to dApp connector or local Ergo node";
 
         return (
 
@@ -640,9 +640,9 @@ export default class TxBuilder extends React.Component {
                             <div className="d-flex flex-row align-items-center justify-content-between">
                                 <div className="d-flex flex-row align-items-center ">
                                     <h6>Sign transaction </h6>&nbsp;
-                                    <ImageButton id="sign-and-send-yoroi" color="blue" icon="send" tips="Sign and send transaction with Yoroi"
+                                    <ImageButton id="sign-and-send-yoroi" color="blue" icon="send" tips="Sign and send transaction with dApp connector"
                                         onClick={() => { this.signAndSendTxYoroi(txJson); }} />
-                                    <ImageButton id="sign-yoroi" color="blue" icon="border_color" tips="Sign transaction with Yoroi"
+                                    <ImageButton id="sign-yoroi" color="blue" icon="border_color" tips="Sign transaction with dApp connector"
                                         onClick={() => { this.signTxYoroi(txJson); }} />
                                     <ImageButton id="sign-mnemonic" color="orange" icon="border_color" tips="Sign with mnemonic"
                                         onClick={this.signTxJsonMnemonic} />
@@ -695,7 +695,7 @@ export default class TxBuilder extends React.Component {
                             <div className="d-flex flex-row">
                                 <h6>Signed transaction</h6>&nbsp;
                                 <ImageButton id="send-tx-yoroi" color="blue" icon="send"
-                                    tips="Send to Yoroi"
+                                    tips="Send to dApp connector"
                                     onClick={this.sendTxYoroi}
                                 />
                                 <ImageButton id="send-tx-node" color="orange" icon="send"
@@ -723,7 +723,7 @@ export default class TxBuilder extends React.Component {
                             <h6>Transaction import/export</h6>
                             <div className="d-flex flex-row p-1">
                                 <ImageButtonLabeled id="get-yoroi-tx" color="blue" icon="download"
-                                    label="Get Yoroi format" onClick={this.setTxYoroiJsonRaw}
+                                    label="Get dApp connector format" onClick={this.setTxYoroiJsonRaw}
                                 />
                                 <ImageButtonLabeled id="get-swagger-tx" color="blue" icon="download"
                                     label="Get Swagger format" onClick={this.setTxSwaggerJsonRaw}

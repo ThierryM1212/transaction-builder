@@ -4,7 +4,7 @@
 Manipulate ergo transaction input and output boxes to build transactions.<br/>
 Import export transactions.<br/>
 
-Try it at: https://transaction-builder.ergo.ga/
+Try it at: https://thierrym1212.github.io/txbuilder/
 
 ## Usage
 $ git clone https://github.com/ThierryM1212/transaction-builder.git<br/>

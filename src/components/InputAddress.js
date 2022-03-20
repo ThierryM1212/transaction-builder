@@ -18,7 +18,7 @@ export default function InputAddress(props) {
             <div className="d-flex flex-row align-items-center">
 
                 <ImageButtonLabeled id="fetch-explorer" color="blue" icon="download" label="Fetch explorer" onClick={e => props.onClick()}/>
-                <ImageButtonLabeled id="fetch-yoroi" color="blue" icon="download" label="Fetch Yoroi" onClick={e => props.fetchYoroi()}/>
+                <ImageButtonLabeled id="fetch-yoroi" color="blue" icon="download" label="Fetch dApp connector" onClick={e => props.fetchYoroi()}/>
 
 
             </div>
