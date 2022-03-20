@@ -17,7 +17,7 @@ $ npm run build
 
 # Apache proxy configuration to open the node used URLs
 ```
-    <Location "/blocks">
+    <Location "/blocks/*">
         ProxyPreserveHost On
         ProxyPass http://localhost:9053/blocks/lastHeaders/10
         ProxyPassReverse http://localhost:9053/blocks/lastHeaders/10
